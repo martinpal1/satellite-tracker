@@ -29,6 +29,7 @@ export default function SatellitePanel({
           <strong>{count}</strong>
           <span>Tracked</span>
         </div>
+
         <div>
           <strong>{clock.toUTCString().slice(17, 25)}</strong>
           <span>UTC</span>
@@ -40,20 +41,31 @@ export default function SatellitePanel({
           <span>Source</span>
           <strong>{source ?? "Loading"}</strong>
         </div>
+
         <div>
           <span>Cache</span>
           <strong>{cached ? "HIT" : "LIVE"}</strong>
         </div>
+
         <div>
-          <span>Updated</span>
-          <strong>{updatedAt ? new Date(updatedAt).toLocaleTimeString() : "--"}</strong>
+          <span>TLE Loaded</span>
+          <strong>
+            {updatedAt ? new Date(updatedAt).toLocaleTimeString() : "--"}
+          </strong>
+        </div>
+
+        <div>
+          <span>Position Refresh</span>
+          <strong>{clock.toLocaleTimeString()}</strong>
         </div>
       </div>
 
       <div className="selected-card">
         <h2>Selected Satellite</h2>
 
-        {!selected && <p className="muted">Click a satellite marker to inspect it.</p>}
+        {!selected && (
+          <p className="muted">Click a satellite marker to inspect it.</p>
+        )}
 
         {selected && (
           <div className="sat-details">
@@ -71,17 +83,29 @@ export default function SatellitePanel({
 
             <div>
               <span>Latitude</span>
-              <strong>{selected.position?.latitude.toFixed(3)}°</strong>
+              <strong>
+                {selected.position
+                  ? `${selected.position.latitude.toFixed(3)}°`
+                  : "--"}
+              </strong>
             </div>
 
             <div>
               <span>Longitude</span>
-              <strong>{selected.position?.longitude.toFixed(3)}°</strong>
+              <strong>
+                {selected.position
+                  ? `${selected.position.longitude.toFixed(3)}°`
+                  : "--"}
+              </strong>
             </div>
 
             <div>
               <span>Altitude</span>
-              <strong>{selected.position?.altitudeKm.toFixed(1)} km</strong>
+              <strong>
+                {selected.position
+                  ? `${selected.position.altitudeKm.toFixed(1)} km`
+                  : "--"}
+              </strong>
             </div>
 
             <div>

@@ -7,19 +7,21 @@ import { useSatellites } from "./hooks/useSatellites";
 
 export default function App() {
   const [group, setGroup] = useState("stations");
-  const [selected, setSelected] = useState<SatelliteWithPosition | null>(null);
+  const [selectedNoradId, setSelectedNoradId] = useState<number | null>(null);
 
-  const {
-    data,
-    satellites,
-    loading,
-    error,
-    clock
-  } = useSatellites(group);
+  const { data, satellites, loading, error, clock } = useSatellites(group);
+
+  const selected =
+    satellites.find((satellite) => satellite.noradId === selectedNoradId) ??
+    null;
 
   function handleGroupChange(nextGroup: string) {
     setGroup(nextGroup);
-    setSelected(null);
+    setSelectedNoradId(null);
+  }
+
+  function handleSelectSatellite(satellite: SatelliteWithPosition) {
+    setSelectedNoradId(satellite.noradId);
   }
 
   return (
@@ -27,7 +29,7 @@ export default function App() {
       <EarthScene
         satellites={satellites}
         selected={selected}
-        onSelect={setSelected}
+        onSelect={handleSelectSatellite}
       />
 
       <div className="overlay">
