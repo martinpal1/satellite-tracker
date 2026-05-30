@@ -58,3 +58,18 @@ export function attachLivePositions(
     position: getSatellitePosition(satelliteItem, date)
   }));
 }
+
+export function latLonToScenePosition(
+  latitude: number,
+  longitude: number,
+  radius = 2
+) {
+  const latRad = latitude * Math.PI / 180;
+  const lonRad = longitude * Math.PI / 180;
+
+  return {
+    x: radius * Math.cos(latRad) * Math.cos(lonRad),
+    y: radius * Math.sin(latRad),
+    z: -radius * Math.cos(latRad) * Math.sin(lonRad)
+  };
+}

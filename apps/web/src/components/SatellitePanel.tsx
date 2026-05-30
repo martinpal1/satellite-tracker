@@ -7,7 +7,19 @@ type SatellitePanelProps = {
   updatedAt?: string;
   cached?: boolean;
   clock: Date;
+  group: string;
+  onGroupChange: (group: string) => void;
 };
+
+const GROUPS = [
+  { label: "Active Satellites", value: "active" },
+  { label: "ISS / Stations", value: "stations" },
+  { label: "Weather Satellites", value: "weather" },
+  { label: "GPS Satellites", value: "gps-ops" },
+  { label: "Starlink", value: "starlink" },
+  { label: "Geostationary", value: "geo" },
+  { label: "Science Satellites", value: "science" }
+];
 
 export default function SatellitePanel({
   selected,
@@ -15,104 +27,76 @@ export default function SatellitePanel({
   source,
   updatedAt,
   cached,
-  clock
+  clock,
+  group,
+  onGroupChange
 }: SatellitePanelProps) {
   return (
-    <aside className="panel">
-      <div className="panel-header">
+    <aside className="dashboard-bar">
+      <div className="dashboard-brand">
         <h1>SATTRACKER</h1>
-        <p>Live orbital intelligence dashboard</p>
+        <span>Live orbital intelligence</span>
       </div>
 
-      <div className="stat-grid">
-        <div>
-          <strong>{count}</strong>
-          <span>Tracked</span>
-        </div>
+      <div className="dashboard-control">
+        <span>Satellite Type</span>
 
-        <div>
-          <strong>{clock.toUTCString().slice(17, 25)}</strong>
-          <span>UTC</span>
-        </div>
+        <select
+          value={group}
+          onChange={(event) => onGroupChange(event.target.value)}
+        >
+          {GROUPS.map((item) => (
+            <option key={item.value} value={item.value}>
+              {item.label}
+            </option>
+          ))}
+        </select>
       </div>
 
-      <div className="data-source">
-        <div>
-          <span>Source</span>
-          <strong>{source ?? "Loading"}</strong>
-        </div>
-
-        <div>
-          <span>Cache</span>
-          <strong>{cached ? "HIT" : "LIVE"}</strong>
-        </div>
-
-        <div>
-          <span>TLE Loaded</span>
-          <strong>
-            {updatedAt ? new Date(updatedAt).toLocaleTimeString() : "--"}
-          </strong>
-        </div>
-
-        <div>
-          <span>Position Refresh</span>
-          <strong>{clock.toLocaleTimeString()}</strong>
-        </div>
+      <div className="dashboard-item">
+        <span>Tracked</span>
+        <strong>{count}</strong>
       </div>
 
-      <div className="selected-card">
-        <h2>Selected Satellite</h2>
+      <div className="dashboard-item">
+        <span>UTC</span>
+        <strong>{clock.toUTCString().slice(17, 25)}</strong>
+      </div>
 
-        {!selected && (
-          <p className="muted">Click a satellite marker to inspect it.</p>
-        )}
+      <div className="dashboard-item">
+        <span>Source</span>
+        <strong>{source ?? "Loading"}</strong>
+      </div>
+
+      <div className="dashboard-item">
+        <span>Cache</span>
+        <strong>{cached ? "HIT" : "LIVE"}</strong>
+      </div>
+
+      <div className="dashboard-item">
+        <span>TLE Loaded</span>
+        <strong>
+          {updatedAt ? new Date(updatedAt).toLocaleTimeString() : "--"}
+        </strong>
+      </div>
+
+      <div className="dashboard-item">
+        <span>Position Refresh</span>
+        <strong>{clock.toLocaleTimeString()}</strong>
+      </div>
+
+      <div className="dashboard-selected">
+        <span>Selected Satellite</span>
+
+        {!selected && <strong>None selected</strong>}
 
         {selected && (
-          <div className="sat-details">
-            <h3>{selected.name}</h3>
-
-            <div>
-              <span>NORAD ID</span>
-              <strong>{selected.noradId || "Unknown"}</strong>
-            </div>
-
-            <div>
-              <span>Category</span>
-              <strong>{selected.category}</strong>
-            </div>
-
-            <div>
-              <span>Latitude</span>
-              <strong>
-                {selected.position
-                  ? `${selected.position.latitude.toFixed(3)}°`
-                  : "--"}
-              </strong>
-            </div>
-
-            <div>
-              <span>Longitude</span>
-              <strong>
-                {selected.position
-                  ? `${selected.position.longitude.toFixed(3)}°`
-                  : "--"}
-              </strong>
-            </div>
-
-            <div>
-              <span>Altitude</span>
-              <strong>
-                {selected.position
-                  ? `${selected.position.altitudeKm.toFixed(1)} km`
-                  : "--"}
-              </strong>
-            </div>
-
-            <div>
-              <span>TLE Epoch</span>
-              <strong>{selected.epoch}</strong>
-            </div>
-          </div>
+          <strong>
+            {selected.name} ·{" "}
+            {selected.position
+              ? `${selected.position.latitude.toFixed(2)}°, ${selected.position.longitude.toFixed(2)}°`
+              : "No position"}
+          </strong>
         )}
       </div>
     </aside>

@@ -28,3 +28,17 @@ export type SatellitePosition = {
 export type SatelliteWithPosition = SatelliteTle & {
   position: SatellitePosition | null;
 };
+
+export type WeatherPoint = {
+  latitude: number;
+  longitude: number;
+  cloudCover: number;
+  precipitation: number;
+};
+
+export type WeatherApiResponse = {
+  source: string;
+  updatedAt: string;
+  count: number;
+  points: WeatherPoint[];
+};

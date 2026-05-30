@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import satellitesRouter from "./routes/satellites.js";
+import weatherRouter from "./routes/weather.js";
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.get("/health", (_req, res) => {
 });
 
 app.use("/api/satellites", satellitesRouter);
+app.use("/api/weather", weatherRouter);
 
 app.listen(PORT, () => {
   console.log(`SATTRACKER API running on http://localhost:${PORT}`);

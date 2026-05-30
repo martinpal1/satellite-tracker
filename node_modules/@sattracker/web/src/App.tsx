@@ -1,13 +1,13 @@
 import { useState } from "react";
 import type { SatelliteWithPosition } from "@sattracker/shared";
 import EarthScene from "./components/EarthScene";
-import FilterBar from "./components/FilterBar";
 import SatellitePanel from "./components/SatellitePanel";
 import { useSatellites } from "./hooks/useSatellites";
 
 export default function App() {
   const [group, setGroup] = useState("stations");
   const [selectedNoradId, setSelectedNoradId] = useState<number | null>(null);
+  const [showDashboard, setShowDashboard] = useState(true);
 
   const { data, satellites, loading, error, clock } = useSatellites(group);
 
@@ -30,21 +30,30 @@ export default function App() {
         satellites={satellites}
         selected={selected}
         onSelect={handleSelectSatellite}
+        showWeather={true}
+        showVisibilityCone={true}
       />
 
       <div className="overlay">
-        <SatellitePanel
-          selected={selected}
-          count={satellites.length}
-          source={data?.source}
-          updatedAt={data?.updatedAt}
-          cached={data?.cached}
-          clock={clock}
-        />
+        {showDashboard && (
+          <SatellitePanel
+            selected={selected}
+            count={satellites.length}
+            source={data?.source}
+            updatedAt={data?.updatedAt}
+            cached={data?.cached}
+            clock={clock}
+            group={group}
+            onGroupChange={handleGroupChange}
+          />
+        )}
 
-        <div className="top-bar">
-          <FilterBar group={group} onGroupChange={handleGroupChange} />
-        </div>
+        <button
+          className="dashboard-toggle"
+          onClick={() => setShowDashboard(!showDashboard)}
+        >
+          {showDashboard ? "Hide Dashboard" : "Show Dashboard"}
+        </button>
 
         {loading && (
           <div className="loading">

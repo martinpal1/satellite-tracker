@@ -4,11 +4,15 @@ import { OrbitControls, Stars, useTexture } from "@react-three/drei";
 import * as THREE from "three";
 import type { SatelliteWithPosition } from "@sattracker/shared";
 import SatelliteMarker from "./SatelliteMarker";
+import VisibilityCone from "./VisibilityCone";
+import CloudTileLayer from "./CloudTileLayer";
 
 type EarthSceneProps = {
   satellites: SatelliteWithPosition[];
   selected: SatelliteWithPosition | null;
   onSelect: (satellite: SatelliteWithPosition) => void;
+  showWeather: boolean;
+  showVisibilityCone: boolean;
 };
 
 function latLonToUnitVector(latitude: number, longitude: number) {
@@ -24,6 +28,7 @@ function latLonToUnitVector(latitude: number, longitude: number) {
 
 function getSunDirection(date: Date) {
   const startOfYear = Date.UTC(date.getUTCFullYear(), 0, 0);
+
   const dayOfYear =
     (date.getTime() - startOfYear) / (1000 * 60 * 60 * 24);
 
@@ -64,7 +69,9 @@ function Earth() {
   );
 
   useFrame(() => {
-    if (!materialRef.current) return;
+    if (!materialRef.current) {
+      return;
+    }
 
     materialRef.current.uniforms.sunDirection.value = getSunDirection(
       new Date()
@@ -104,7 +111,10 @@ function Earth() {
               vec3 dayColor = texture2D(dayTexture, vUv).rgb;
               vec3 nightColor = texture2D(nightTexture, vUv).rgb;
 
-              float sunlight = dot(normalize(vNormalWorld), normalize(sunDirection));
+              float sunlight = dot(
+                normalize(vNormalWorld),
+                normalize(sunDirection)
+              );
 
               float blend = smoothstep(-0.18, 0.18, sunlight);
 
@@ -142,7 +152,9 @@ function Earth() {
 export default function EarthScene({
   satellites,
   selected,
-  onSelect
+  onSelect,
+  showWeather,
+  showVisibilityCone
 }: EarthSceneProps) {
   return (
     <Canvas camera={{ position: [0, 2.8, 7], fov: 45 }}>
@@ -152,6 +164,10 @@ export default function EarthScene({
       <Stars radius={80} depth={40} count={3500} factor={4} fade />
 
       <Earth />
+
+      <CloudTileLayer visible={showWeather} />
+
+      <VisibilityCone satellite={selected} visible={showVisibilityCone} />
 
       {satellites.map((satellite) => (
         <SatelliteMarker
