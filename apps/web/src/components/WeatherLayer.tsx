@@ -6,55 +6,66 @@ type WeatherLayerProps = {
   visible: boolean;
 };
 
-function weatherColour(point: WeatherPoint) {
-  if (point.precipitation > 1) {
-    return "#44aaff";
+function getWeatherColor(point: WeatherPoint) {
+  const precipitation = point.precipitation ?? 0;
+  const cloudCover = point.cloudCover ?? 0;
+
+  if (precipitation > 1) {
+    return "#4fc3ff";
   }
 
-  if (point.cloudCover > 75) {
-    return "#ffffff";
+  if (cloudCover > 75) {
+    return "#d8d8d8";
   }
 
-  if (point.cloudCover > 40) {
-    return "#b7d7ff";
+  if (cloudCover > 40) {
+    return "#9aa7b1";
   }
 
-  return "#88ccff";
+  return "#ffffff";
 }
 
-function weatherOpacity(point: WeatherPoint) {
-  if (point.precipitation > 1) return 0.75;
-  return Math.max(0.08, point.cloudCover / 130);
+function getWeatherOpacity(point: WeatherPoint) {
+  const precipitation = point.precipitation ?? 0;
+  const cloudCover = point.cloudCover ?? 0;
+
+  if (precipitation > 1) {
+    return 0.75;
+  }
+
+  return Math.max(0.08, cloudCover / 130);
 }
 
-export default function WeatherLayer({ points, visible }: WeatherLayerProps) {
-  if (!visible) return null;
+export default function WeatherLayer({
+  points,
+  visible
+}: WeatherLayerProps) {
+  if (!visible) {
+    return null;
+  }
 
   return (
     <group>
-      {points.map((point) => {
-        const pos = latLonToScenePosition(
+      {points.map((point, index) => {
+        const precipitation = point.precipitation ?? 0;
+        const cloudCover = point.cloudCover ?? 0;
+
+        const position = latLonToScenePosition(
           point.latitude,
           point.longitude,
-          2.045
+          precipitation > 1 ? 2.09 : 2.035 + cloudCover / 1000
         );
-
-        const size =
-          point.precipitation > 1
-            ? 0.09
-            : 0.035 + point.cloudCover / 1000;
 
         return (
           <mesh
-            key={`${point.latitude}-${point.longitude}`}
-            position={[pos.x, pos.y, pos.z]}
+            key={`${point.latitude}-${point.longitude}-${index}`}
+            position={[position.x, position.y, position.z]}
           >
-            <sphereGeometry args={[size, 10, 10]} />
+            <sphereGeometry args={[0.025, 12, 12]} />
             <meshBasicMaterial
-              color={weatherColour(point)}
+              color={getWeatherColor(point)}
               transparent
-              opacity={weatherOpacity(point)}
-              depthWrite={false}
+              opacity={getWeatherOpacity(point)}
             />
           </mesh>
         );
