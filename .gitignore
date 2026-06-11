@@ -7,3 +7,14 @@ apps/web/.env.local
 .DS_Store
 npm-debug.log*
 .vite
+.vercel
+
+# Local environment files
+.env
+.env.local
+apps/web/.env
+apps/web/.env.local
+!.env.example
+!apps/web/.env.example
+.cache/
+*.log

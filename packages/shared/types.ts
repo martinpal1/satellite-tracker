@@ -1,10 +1,18 @@
+export type SatelliteDataAccuracy = "live" | "cached" | "stale";
+
 export type SatelliteTle = {
   name: string;
   noradId: number;
+  cosparId?: string;
   line1: string;
   line2: string;
   category: string;
   epoch: string;
+  /**
+   * True when the app is propagating the satellite from stale cached TLE data
+   * because current CelesTrak data could not be fetched.
+   */
+  uncertain?: boolean;
 };
 
 export type SatelliteApiResponse = {
@@ -13,6 +21,10 @@ export type SatelliteApiResponse = {
   count: number;
   updatedAt: string;
   cached: boolean;
+  stale: boolean;
+  accuracy: SatelliteDataAccuracy;
+  dataAgeMs?: number;
+  warning?: string;
   satellites: SatelliteTle[];
 };
 
@@ -27,18 +39,4 @@ export type SatellitePosition = {
 
 export type SatelliteWithPosition = SatelliteTle & {
   position: SatellitePosition | null;
-};
-
-export type WeatherPoint = {
-  latitude: number;
-  longitude: number;
-  cloudCover: number;
-  precipitation: number;
-};
-
-export type WeatherApiResponse = {
-  source: string;
-  updatedAt: string;
-  count: number;
-  points: WeatherPoint[];
 };
